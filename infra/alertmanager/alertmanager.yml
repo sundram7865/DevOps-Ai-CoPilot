@@ -1,0 +1,16 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  # All alerts go to the webhook receiver
+  receiver: "fastapi-webhook"
+  group_by: ["alertname", "service"]
+  group_wait: 10s       # wait 10s to group similar alerts together
+  group_interval: 5m    # wait 5m before sending a new group
+  repeat_interval: 1h   # re-notify after 1h if still firing
+
+receivers:
+  - name: "fastapi-webhook"
+    webhook_configs:
+      - url: "http://backend:8000/webhook/alert"
+        send_resolved: true   # also notify when alert resolves
