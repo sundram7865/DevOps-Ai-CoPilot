@@ -1,0 +1,39 @@
+groups:
+  - name: infrastructure
+    rules:
+
+      # Container CPU above 80% for 1 minute
+      - alert: HighCPU
+        expr: rate(container_cpu_usage_seconds_total{name="sample-app"}[2m]) * 100 > 80
+        for: 1m
+        labels:
+          severity: high
+        annotations:
+          summary: "High CPU on {{ $labels.name }}"
+          description: "CPU is {{ $value | printf \"%.1f\" }}%"
+
+      # Container memory above 85%
+      - alert: HighMemory
+        expr: (container_memory_usage_bytes{name="sample-app"} / container_spec_memory_limit_bytes{name="sample-app"}) * 100 > 85
+        for: 1m
+        labels:
+          severity: high
+        annotations:
+          summary: "High memory on {{ $labels.name }}"
+
+      # Container restarted more than 3 times
+      - alert: ContainerRestartLoop
+        expr: increase(container_restart_count{name="sample-app"}[10m]) > 3
+        labels:
+          severity: critical
+        annotations:
+          summary: "Container {{ $labels.name }} restart loop"
+
+      # HTTP error rate above 5%
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) * 100 > 5
+        for: 2m
+        labels:
+          severity: medium
+        annotations:
+          summary: "High error rate on {{ $labels.route }}"
