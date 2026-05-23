@@ -1,0 +1,179 @@
+# =========================================================
+# ROOT
+# =========================================================
+
+.env
+.env.*
+!.env.example
+
+*.log
+logs/
+tmp/
+temp/
+
+# macOS
+.DS_Store
+
+# Linux
+*~
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================================================
+# NODE / FRONTEND / SAMPLE APP
+# =========================================================
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Next.js
+.next/
+out/
+dist/
+build/
+
+# Vite
+vite.svg
+
+# TypeScript
+*.tsbuildinfo
+
+# Coverage
+coverage/
+
+# =========================================================
+# PYTHON / BACKEND
+# =========================================================
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python virtual envs
+.venv/
+venv/
+env/
+ENV/
+
+# Python tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
+
+# Coverage
+.coverage
+coverage.xml
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# =========================================================
+# DATABASES / VOLUMES
+# =========================================================
+
+postgres_data/
+redis_data/
+grafana_data/
+prometheus_data/
+loki_data/
+tempo_data/
+
+*.db
+*.sqlite3
+
+# =========================================================
+# DOCKER
+# =========================================================
+
+docker-data/
+docker-volumes/
+
+# Ignore local override compose files
+docker-compose.override.yml
+
+# =========================================================
+# GRAFANA
+# =========================================================
+
+infra/grafana/plugins/
+infra/grafana/data/
+
+# =========================================================
+# LANGFUSE / AI
+# =========================================================
+
+.langfuse/
+langfuse-data/
+
+# =========================================================
+# CELERY
+# =========================================================
+
+celerybeat-schedule
+
+# =========================================================
+# TEST OUTPUTS
+# =========================================================
+
+test-results/
+playwright-report/
+
+# =========================================================
+# SECURITY / SECRETS
+# =========================================================
+
+*.pem
+*.key
+*.crt
+*.p12
+
+secrets/
+credentials/
+
+# =========================================================
+# LOCAL DEV FILES
+# =========================================================
+
+.local/
+.cache/
+
+# =========================================================
+# TERRAFORM (future infra support)
+# =========================================================
+
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# =========================================================
+# KUBERNETES (future support)
+# =========================================================
+
+kubeconfig
+*.kubeconfig
+
+# =========================================================
+# OS GENERATED FILES
+# =========================================================
+
+ehthumbs.db
+Icon?
