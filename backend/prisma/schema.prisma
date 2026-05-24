@@ -1,0 +1,116 @@
+generator client {
+  provider             = "prisma-client-py"
+  interface            = "asyncio"
+  recursive_type_depth = 5
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ─────────────────────────────────────
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IncidentStatus {
+  DETECTING
+  INVESTIGATING
+  AWAITING_APPROVAL
+  APPROVED
+  EXECUTING
+  VERIFYING
+  RESOLVED
+  FAILED
+}
+
+enum ActionStatus {
+  PROPOSED
+  APPROVED
+  REJECTED
+  EXECUTING
+  COMPLETED
+  FAILED
+}
+
+// ── Models ────────────────────────────────────
+
+model Incident {
+  id          String         @id @default(cuid())
+  title       String
+  description String?
+  service     String
+  severity    Severity       @default(LOW)
+  status      IncidentStatus @default(DETECTING)
+
+  // Raw alert payload from Alertmanager
+  alertPayload Json?
+
+  // RCA fields
+  rootCause      String?
+  confidence     Float?
+  affectedServices String[]
+
+  // Timing
+  detectedAt  DateTime  @default(now())
+  resolvedAt  DateTime?
+  mttr        Int?      // mean time to resolve in seconds
+
+  // Relations
+  events    IncidentEvent[]
+  actions   RemediationAction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("incidents")
+}
+
+model IncidentEvent {
+  id         String   @id @default(cuid())
+  incidentId String
+  type       String   // DETECTED, INVESTIGATING, RCA_COMPLETE, etc.
+  message    String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
+  @@map("incident_events")
+}
+
+model RemediationAction {
+  id          String       @id @default(cuid())
+  incidentId  String
+  action      String       // restart_container, scale_service, etc.
+  target      String       // container/service name
+  params      Json?        // additional params
+  status      ActionStatus @default(PROPOSED)
+  proposedBy  String       @default("ai-agent")
+  approvedBy  String?      // user id who approved
+  executedAt  DateTime?
+  result      Json?        // execution result
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
+  @@map("remediation_actions")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         String   @default("operator") // admin, operator, viewer
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("users")
+}
