@@ -15,7 +15,7 @@ def mock_incident(id="inc-1", status=IncidentStatus.DETECTING):
         "status": status,
         "rootCause": None,
         "confidence": None,
-        "detectedAt": datetime.utcnow(),
+        "detectedAt": datetime.now(datetime.UTC),
         "resolvedAt": None,
         "mttr": None,
     })()

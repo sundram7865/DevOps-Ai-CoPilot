@@ -1,4 +1,4 @@
-from fastapi import APIRouter, BackgroundTasks, HTTPException
+from fastapi import APIRouter, BackgroundTasks
 from app.schemas.webhook import AlertmanagerPayload
 from app.services.incident_service import create_incident, add_incident_event
 from app.core.logging import logger
@@ -13,8 +13,10 @@ async def receive_alert(
 ):
     logger.info("webhook_received", alerts=len(payload.alerts), status=payload.status)
 
+    incidents_created = 0
+
     for alert in payload.alerts:
-        if alert.status == "resolved":
+        if alert.status != "firing":
             continue
 
         incident = await create_incident(
@@ -35,5 +37,6 @@ async def receive_alert(
         # background_tasks.add_task(run_agent_task, incident.id)
 
         logger.info("incident_queued", incident_id=incident.id)
+        incidents_created += 1
 
-    return {"status": "received", "incidents_created": len(payload.alerts)}
+    return {"status": "received", "incidents_created": incidents_created}
