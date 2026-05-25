@@ -181,6 +181,7 @@ services:
         condition: service_healthy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker-compose.yml:/docker-compose.yml:ro
 
   # ── CELERY WORKER ─────────────────────────────
   celery-worker:
@@ -196,3 +197,4 @@ services:
       - backend
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker-compose.yml:/docker-compose.yml:ro
