@@ -1,6 +1,7 @@
-from fastapi import APIRouter, BackgroundTasks
+from fastapi import APIRouter
 from app.schemas.webhook import AlertmanagerPayload
 from app.services.incident_service import create_incident, add_incident_event
+from app.workers.tasks import run_agent_task
 from app.core.logging import logger
 
 router = APIRouter()
@@ -8,8 +9,7 @@ router = APIRouter()
 
 @router.post("/webhook/alert", status_code=200)
 async def receive_alert(
-    payload: AlertmanagerPayload,
-    background_tasks: BackgroundTasks,
+    payload: AlertmanagerPayload
 ):
     logger.info("webhook_received", alerts=len(payload.alerts), status=payload.status)
 
@@ -33,10 +33,14 @@ async def receive_alert(
             metadata={"fingerprint": alert.fingerprint},
         )
 
-        # Phase 4: trigger agent here
-        # background_tasks.add_task(run_agent_task, incident.id)
+        # Trigger agent as Celery background task
+        run_agent_task.delay(
+            incident_id=incident.id,
+            service=alert.labels.service,
+            alert_payload=payload.model_dump(),
+        )
 
-        logger.info("incident_queued", incident_id=incident.id)
+        logger.info("agent_triggered", incident_id=incident.id)
         incidents_created += 1
 
     return {"status": "received", "incidents_created": incidents_created}
